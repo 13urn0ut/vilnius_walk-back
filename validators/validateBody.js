@@ -38,6 +38,24 @@ exports.validateSignup = [
   }),
 
   checkExact([], {
-    message: "Invalid fields",
+    message: (fields) =>
+      `Invalid fields: ${fields.map((field) => field.path).join(", ")}`,
+  }),
+];
+
+exports.validateLogin = [
+  body("email")
+    .trim()
+    .isEmail()
+    .withMessage("Please enter a valid email address"),
+
+  body("password")
+    .trim()
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+
+  checkExact([], {
+    message: (fields) =>
+      `Invalid fields: ${fields.map((field) => field.path).join(", ")}`,
   }),
 ];

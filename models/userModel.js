@@ -13,8 +13,6 @@ exports.createUser = async (user) => {
 };
 
 exports.getUserByEmail = async (email) => {
-  console.log(email);
-
   const [user] = await sql`
     SELECT users.*
     FROM users

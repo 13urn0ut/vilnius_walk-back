@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
-const { createUser } = require("../models/userModel");
+const { createUser, getUserByEmail } = require("../models/userModel");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -30,6 +30,35 @@ exports.signup = async (req, res, next) => {
     res.status(201).json({
       status: "success",
       data: newUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+      throw new AppError("Incorrect email or password", 401);
+    }
+
+    const isPasswordCorrect = await argon2.verify(user.password, password);
+
+    if (!isPasswordCorrect) {
+      throw new AppError("Incorrect email or password", 401);
+    }
+
+    const token = signToken(user.id);
+    sendCookie(res, token);
+
+    user.password = undefined;
+
+    res.status(200).json({
+      status: "success",
+      data: user,
     });
   } catch (error) {
     next(error);
