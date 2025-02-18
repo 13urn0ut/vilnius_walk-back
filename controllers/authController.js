@@ -1,6 +1,11 @@
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
-const { createUser, getUserByEmail } = require("../models/userModel");
+const {
+  createUser,
+  getUserByEmail,
+  getUserById,
+} = require("../models/userModel");
+const AppError = require("../utils/appError");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -60,6 +65,27 @@ exports.login = async (req, res, next) => {
       status: "success",
       data: user,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.protect = async (req, res, next) => {
+  try {
+    const token = req.cookies?.jwt;
+
+    if (!token) {
+      throw new AppError(
+        "You are not logged in! Please log in to get access.",
+        401
+      );
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = await getUserById(decoded.id);
+
+    next();
   } catch (error) {
     next(error);
   }
