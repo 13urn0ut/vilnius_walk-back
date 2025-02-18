@@ -3,10 +3,10 @@ const { sql } = require("../dbConnection.js");
 exports.createUser = async (user) => {
   const { email, role, password } = user;
 
-  const [newUser] = sql`
+  const [newUser] = await sql`
     INSERT INTO users (email, role, password)
     VALUES (${email}, ${role}, ${password})
-    RETURNING *
+    RETURNING id, email, role
   `;
 
   return newUser;
@@ -15,7 +15,7 @@ exports.createUser = async (user) => {
 exports.getUserByEmail = async (email) => {
   console.log(email);
 
-  const [user] = sql`
+  const [user] = await sql`
     SELECT users.*
     FROM users
     WHERE users.email = ${email}

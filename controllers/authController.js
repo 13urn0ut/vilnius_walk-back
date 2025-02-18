@@ -23,7 +23,7 @@ exports.signup = async (req, res, next) => {
     const hashPassword = await argon2.hash(password);
     const role = "user";
 
-    const newUser = createUser({ email, password: hashPassword, role });
+    const newUser = await createUser({ email, password: hashPassword, role });
     const token = signToken(newUser.id);
     sendCookie(res, token);
 
