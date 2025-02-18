@@ -70,6 +70,14 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.logout = (req, res, next) => {
+  res.clearCookie("jwt");
+
+  res.status(200).json({
+    status: "success",
+  });
+};
+
 exports.protect = async (req, res, next) => {
   try {
     const token = req.cookies?.jwt;
