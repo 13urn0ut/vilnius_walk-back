@@ -1,6 +1,6 @@
 const excurtionRouter = require("express").Router();
-const { createExcursion } = require("../controllers/excurtionController");
+const { createExcursion, getAllExcursions } = require("../controllers/excurtionController");
 
-excurtionRouter.route("/").post(createExcursion);
+excurtionRouter.route("/").post(createExcursion).get(getAllExcursions);
 
 module.exports = excurtionRouter;

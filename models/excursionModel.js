@@ -2,18 +2,33 @@ const { sql } = require("../dbConnection.js");
 
 // NOT FINISHED YET
 exports.getAllExcursions = async () => {
-  const [excursions] = await sql`
-    SELECT *
+  const excursions = await sql.begin(async () => {
+    let excursions = await sql`
+    SELECT excursions.*, categories.category AS category
     FROM excursions
     JOIN categories
-    ON excursions.category_id = categories.id
-    JOIN excursions_dates
-    ON excursions.id = excursions_dates.excursion_id
-    JOIN dates
-    ON excursions_dates.date_id = dates.id
-    JOIN users_excursions_dates
-    ON excursions_dates.id = users_excursions_dates.excursion_date_id
+    ON excursions.category_id = categories.id   
   `;
+
+    excursions = await Promise.all(
+      excursions.map(async (excursion) => {
+        const dates = await sql`
+        SELECT dates.date
+        FROM dates
+        JOIN excursions_dates
+        ON dates.id = excursions_dates.date_id
+        WHERE excursion_id = ${excursion.id}
+        GROUP BY excursions_dates.excursion_id, dates.date
+      `;
+
+        excursion.dates = dates.map((date) => date.date);
+
+        return excursion;
+      })
+    );
+
+    return excursions;
+  });
 
   return excursions;
 };
