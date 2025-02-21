@@ -2,7 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const userRouter = require("./routes/userRoutes");
-const excurtionRouter = require("./routes/excurtionRoutes");
+const excursionRouter = require("./routes/excursionRoutes");
 const AppError = require("./utils/appError");
 const handleError = require("./utils/handleError");
 const app = express();
@@ -17,7 +17,7 @@ app.use(
 );
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/excurtions", excurtionRouter);
+app.use("/api/v1/excursions", excursionRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
